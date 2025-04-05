@@ -15,6 +15,8 @@ jobs:
   deploy:
     name: Deploy to OpenShift
     runs-on: ubuntu-latest
+    environment:
+      name: Production
     if: github.event.workflow_run.conclusion == 'success'
 
     steps:
@@ -40,10 +42,10 @@ jobs:
           env_vars: "JAVA_OPTS=-Xmx512m"
           labels: "app=${{ env.APP_NAME }}"
 
-      - name: Expose route if needed
-        uses: redhat-actions/oc-expose@v1
-        with:
-          resource: "svc/${{ env.APP_NAME }}"
+#      - name: Expose route if needed
+#        uses: redhat-actions/oc-expose@v1
+#        with:
+#          resource: "svc/${{ env.APP_NAME }}"
 
       - name: Verify deployment
         uses: redhat-actions/oc-rollout@v1
