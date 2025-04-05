@@ -32,7 +32,8 @@ public class BusinessRuleController {
         String customerId = request.getCustomerId();
         List<String> ruleNames = request.getRuleNames();
         List<String> results = new ArrayList<>();
-
+        List<String> results1 = new ArrayList<>();
+        List results2 = new ArrayList();
         logger.info("🔄 Received request to execute business rules for customer ID: {}", customerId);
 
         for (String ruleName : ruleNames) {
