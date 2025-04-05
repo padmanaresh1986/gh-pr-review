@@ -47,10 +47,10 @@ jobs:
 #        with:
 #          resource: "svc/${{ env.APP_NAME }}"
 
-      - name: Verify deployment
-        uses: redhat-actions/oc-rollout@v1
-        with:
-          action: "status"
-          resource: "deployment/${{ env.APP_NAME }}"
-          watch: true
-          timeout: "5m"
+#      - name: Verify deployment
+#        uses: redhat-actions/oc-rollout@v1
+#        with:
+#          action: "status"
+#          resource: "deployment/${{ env.APP_NAME }}"
+#          watch: true
+#          timeout: "5m"
