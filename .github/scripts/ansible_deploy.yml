@@ -19,14 +19,47 @@
       changed_when: false
       failed_when: login_result.rc != 0
 
-    - name: Create a new deployment
+#    - name: Create a new deployment
+#      command: >
+#        oc create deployment {{ app_name }}
+#        --image={{ image_url }}
+#        --namespace={{ project_name }}
+#      register: deployment_result
+#      failed_when: deployment_result.rc != 0
+#      changed_when: "'created' in deployment_result.stdout"
+
+    - name: Check if deployment exists
       command: >
-        oc create deployment {{ app_name }} 
-        --image={{ image_url }} 
-        --namespace={{ project_name }}
-      register: deployment_result
-      failed_when: deployment_result.rc != 0
-      changed_when: "'created' in deployment_result.stdout"
+          oc get deployment {{ app_name }}
+          --namespace={{ project_name }}
+      register: deployment_check
+      ignore_errors: true
+      changed_when: false
+
+    - name: Create or Update deployment
+      block:
+        - name: Create a new deployment
+          command: >
+            oc create deployment {{ app_name }}
+            --image={{ image_url }}
+            --namespace={{ project_name }}
+          when: deployment_check.rc != 0
+          register: deployment_create
+          failed_when: deployment_create.rc != 0
+          changed_when: "'created' in deployment_create.stdout"
+
+        - name: Update existing deployment
+          command: >
+            oc set image deployment/{{ app_name }} {{ container_name }}={{ image_url }}
+            --namespace={{ project_name }}
+          when: deployment_check.rc == 0
+          register: deployment_update
+          failed_when: deployment_update.rc != 0
+          changed_when: "'updated' in deployment_update.stdout"
+      rescue:
+        - name: Debug deployment failure
+          debug:
+            msg: "Failed to create or update deployment: {{ deployment_check.stderr }}"
 
     - name: Expose the deployment as a service
       command: >
