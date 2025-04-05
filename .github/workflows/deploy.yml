@@ -1,0 +1,54 @@
+name: Deploy to OpenShift
+
+on:
+  workflow_run:
+    workflows: ["CI Build"]
+    types:
+      - completed
+
+env:
+  APP_NAME: "business-rule-processor-new"
+  IMAGE_NAME: "quay.io/${{ secrets.QUAY_USERNAME }}/business-rule-processor:v1.0.${{ github.event.workflow_run.run_number }}"
+  NAMESPACE: "${{ secrets.OPENSHIFT_NAMESPACE }}"
+
+jobs:
+  deploy:
+    name: Deploy to OpenShift
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
+
+    steps:
+      - name: Install oc
+        uses: redhat-actions/oc-installer@v1
+        with:
+          oc_version: '4.6'
+
+      - name: Login to OpenShift
+        uses: redhat-actions/oc-login@v1
+        with:
+          openshift_server_url: ${{ secrets.OPENSHIFT_SERVER }}
+          openshift_token: ${{ secrets.OPENSHIFT_TOKEN }}
+          insecure_skip_tls_verify: true
+          namespace: ${{ env.NAMESPACE }}
+
+      - name: Deploy application
+        uses: redhat-actions/oc-new-app@v1
+        with:
+          name: ${{ env.APP_NAME }}
+          image: ${{ env.IMAGE_NAME }}
+          namespace: ${{ env.NAMESPACE }}
+          env_vars: "JAVA_OPTS=-Xmx512m"
+          labels: "app=${{ env.APP_NAME }}"
+
+      - name: Expose route if needed
+        uses: redhat-actions/oc-expose@v1
+        with:
+          resource: "svc/${{ env.APP_NAME }}"
+
+      - name: Verify deployment
+        uses: redhat-actions/oc-rollout@v1
+        with:
+          action: "status"
+          resource: "deployment/${{ env.APP_NAME }}"
+          watch: true
+          timeout: "5m"
