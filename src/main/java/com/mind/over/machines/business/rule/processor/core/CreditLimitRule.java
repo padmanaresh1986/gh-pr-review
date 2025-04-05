@@ -17,9 +17,6 @@ public class CreditLimitRule implements BusinessRule {
             throw new BusinessRuleException("Credit limit exceeded for customer ID: " + customerId);
         }
         logger.info("✅ CreditLimitRule executed successfully for customer ID: {}", customerId);
-        logger.info("✅ CreditLimitRule executed successfully for customer ID: {}", customerId);
-        logger.info("✅ CreditLimitRule executed successfully for customer ID: {}", customerId);
-        logger.info("✅ CreditLimitRule executed successfully for customer ID: {}", customerId);
     }
 
     @Override
