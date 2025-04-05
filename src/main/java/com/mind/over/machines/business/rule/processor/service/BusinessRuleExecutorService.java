@@ -21,13 +21,13 @@ public class BusinessRuleExecutorService {
     // Run rules every 10 seconds for random customer
     @Scheduled(fixedRate = 10000)
     public void executeBusinessRules() {
-        String customerId = generateRandomCustomerId();
-        logger.info("🔄 Executing business rules for customer ID: {}", customerId);
+        String customer_id = generateRandomCustomerId();
+        logger.info("🔄 Executing business rules for customer ID: {}", customer_id);
 
         for (BusinessRule rule : businessRules) {
             try {
-                rule.execute(customerId);
-                logger.info("✅ Rule [{}] passed for customer ID: {}", rule.getRuleName(), customerId);
+                rule.execute(customer_id);
+                logger.info("✅ Rule [{}] passed for customer ID: {}", rule.getRuleName(), customer_id);
             } catch (BusinessRuleException e) {
                 logger.error("❌ Rule [{}] failed: {}", rule.getRuleName(), e.getMessage());
             }
