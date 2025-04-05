@@ -1,0 +1,77 @@
+name: Deploy Application to OpenShift
+
+on:
+  # Trigger the workflow manually or via push/tag events
+  workflow_dispatch:
+    inputs:
+      app_name:
+        description: 'Application Name'
+        required: true
+        type: string
+      container_name:
+        description: 'Container Name'
+        required: true
+        type: string
+      image_url:
+        description: 'Image URL'
+        required: true
+        type: string
+      project_name:
+        description: 'OpenShift Project Name'
+        required: true
+        type: string
+      replicas:
+        description: 'Number of Replicas'
+        required: false
+        default: '1'
+        type: string
+      port:
+        description: 'Service Port'
+        required: false
+        default: '8080'
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Step 2: Install OpenShift CLI (oc)
+      - name: Install OpenShift CLI
+        run: |
+          sudo curl -L https://mirror.openshift.com/pub/openshift-v4/clients/oc/latest/linux/oc.tar.gz | sudo tar -xz -C /usr/local/bin
+
+      # Step 3: Install Ansible
+      - name: Install Ansible
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ansible
+
+      # Step 4: Set up environment variables
+      - name: Set Environment Variables
+        run: |
+          echo "APP_NAME=${{ github.event.inputs.app_name }}" >> $GITHUB_ENV
+          echo "CONTAINER_NAME=${{ github.event.inputs.container_name }}" >> $GITHUB_ENV
+          echo "IMAGE_URL=${{ github.event.inputs.image_url }}" >> $GITHUB_ENV
+          echo "PROJECT_NAME=${{ github.event.inputs.project_name }}" >> $GITHUB_ENV
+          echo "REPLICAS=${{ github.event.inputs.replicas }}" >> $GITHUB_ENV
+          echo "PORT=${{ github.event.inputs.port }}" >> $GITHUB_ENV
+          echo "OC_TOKEN=${{ secrets.OC_TOKEN }}" >> $GITHUB_ENV
+          echo "OC_SERVER=${{ secrets.OC_SERVER }}" >> $GITHUB_ENV
+
+      # Step 5: Run the Ansible playbook
+      - name: Run Ansible Playbook
+        run: |
+          ansible-playbook ansible_deploy.yml \
+            -e app_name=$APP_NAME \
+            -e container_name=$CONTAINER_NAME \
+            -e image_url=$IMAGE_URL \
+            -e project_name=$PROJECT_NAME \
+            -e oc_token=$OC_TOKEN \
+            -e oc_server=$OC_SERVER \
+            -e replicas=$REPLICAS \
+            -e port=$PORT
