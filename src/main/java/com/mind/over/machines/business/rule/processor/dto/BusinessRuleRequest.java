@@ -3,12 +3,12 @@ package com.mind.over.machines.business.rule.processor.dto;
 import java.util.List;
 
 public class BusinessRuleRequest {
-    public String customerId;
-    public List<String> ruleNames;
+    private String customerId;
+    private List<String> ruleNames;
 
     public BusinessRuleRequest(String customerId, List<String> ruleNames) {
-        customerId = customerId;
-        ruleNames = ruleNames;
+        this.customerId = customerId;
+        this.ruleNames = ruleNames;
     }
 
     public String getCustomerId() {
