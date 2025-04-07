@@ -17,6 +17,10 @@ public class FraudCheckRule implements BusinessRule {
             throw new BusinessRuleException("Potential fraud detected for customer ID: " + customerId);
         }
         logger.info("✅ FraudCheckRule executed successfully for customer ID: {}", customerId);
+        logger.info("✅ FraudCheckRule executed successfully for customer ID: {}", customerId);
+        logger.info("✅ FraudCheckRule executed successfully for customer ID: {}", customerId);
+        logger.info("✅ FraudCheckRule executed successfully for customer ID: {}", customerId);
+        logger.info("✅ FraudCheckRule executed successfully for customer ID: {}", customerId);
     }
 
     @Override
